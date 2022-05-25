@@ -38,7 +38,7 @@ export default function Stocks() {
 
                 }}
             >
-                <Tab.Screen name="Stocks" component={StockList} />
+                <Tab.Screen name="StockList" component={StockList} />
                 <Tab.Screen name="Investments" component={InvestmentList} />
                 <Tab.Screen name="Dividends" component={DividendList} />
             </Tab.Navigator>

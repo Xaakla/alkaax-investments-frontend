@@ -1,13 +1,13 @@
-import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {StyleSheet, Text, TouchableOpacity, View, ScrollView, FlatList} from "react-native";
 
 export default function StockList() {
     return (
-        <View style={styles.container}>
+        <ScrollView style={styles.container}>
             <TouchableOpacity style={styles.stockCardContainer}>
                 <Text style={styles.stockCardName}>RECR11</Text>
                 <Text style={styles.stockCardQuotas}>cotas: 11</Text>
             </TouchableOpacity>
-        </View>
+        </ScrollView>
     );
 }
 
@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#04101e',
-        paddingVertical: 24
+        paddingVertical: 12
     },
     stockCardContainer: {
         backgroundColor: '#041b2d',
