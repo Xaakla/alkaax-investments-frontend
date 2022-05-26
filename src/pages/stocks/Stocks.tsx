@@ -1,4 +1,6 @@
 import {StyleSheet, Text, View} from "react-native";
+import ActionButton from 'react-native-action-button';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import StockList from "./stock-list/StockList";
@@ -7,7 +9,7 @@ import InvestmentList from "./investment-list/InvestmentList";
 
 const Tab = createMaterialTopTabNavigator();
 
-export default function Stocks() {
+export default function Stocks({navigation}) {
     return (
         <View style={styles.container}>
             <View style={styles.balanceHeaderView}>
@@ -42,6 +44,18 @@ export default function Stocks() {
                 <Tab.Screen name="Investments" component={InvestmentList} />
                 <Tab.Screen name="Dividends" component={DividendList} />
             </Tab.Navigator>
+
+            <ActionButton buttonColor="rgba(231,76,60,1)">
+                <ActionButton.Item buttonColor='#9b59b6' title="New Batch Dividend" onPress={() => navigation.navigate("NewBatchDividend")}>
+                    <Icon name="md-create" style={styles.actionButtonIcon}/>
+                </ActionButton.Item>
+                <ActionButton.Item buttonColor='#3498db' title="New Batch Investment" onPress={() => navigation.navigate("NewBatchInvestment")}>
+                    <Icon name="md-notifications-off" style={styles.actionButtonIcon}/>
+                </ActionButton.Item>
+                <ActionButton.Item buttonColor='#1abc9c' title="New Stock" onPress={() => {}}>
+                    <Icon name="md-create" style={styles.actionButtonIcon}/>
+                </ActionButton.Item>
+            </ActionButton>
         </View>
     );
 }
@@ -96,5 +110,10 @@ const styles = StyleSheet.create({
     redColor: { color: '#e80000' },
     row: {
         flexDirection: "row"
-    }
+    },
+    actionButtonIcon: {
+        fontSize: 20,
+        height: 22,
+        color: 'white',
+    },
 });

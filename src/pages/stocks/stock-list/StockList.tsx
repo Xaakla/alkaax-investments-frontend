@@ -1,5 +1,6 @@
 import {StyleSheet, Text, TouchableOpacity, View, ScrollView, FlatList} from "react-native";
 
+
 export default function StockList() {
     return (
         <ScrollView style={styles.container}>
