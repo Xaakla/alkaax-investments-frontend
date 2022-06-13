@@ -1,6 +1,5 @@
 import {View, Text, StyleSheet, TouchableOpacity, Button, ScrollView} from 'react-native';
 import SelectDropdown from 'react-native-select-dropdown';
-import {Table, TableWrapper, Row, Rows, Col, Cols, Cell} from 'react-native-table-component';
 import { DataTable } from 'react-native-paper';
 
 export default function NewBatchInvestment() {
@@ -53,7 +52,7 @@ export default function NewBatchInvestment() {
                     <DataTable.Header>
                         <DataTable.Title textStyle={[styles.tableText, styles.tableHeadText]}>Quotas</DataTable.Title>
                         <DataTable.Title textStyle={[styles.tableText, styles.tableHeadText]}>Name</DataTable.Title>
-                        <DataTable.Title numeric textStyle={[styles.tableText, styles.tableHeadText]}>Price</DataTable.Title>
+                        <DataTable.Title numeric textStyle={[styles.tableText, styles.tableHeadText]}>Price (Unity)</DataTable.Title>
                     </DataTable.Header>
 
                     <ScrollView style={styles.tableScrollView}>
