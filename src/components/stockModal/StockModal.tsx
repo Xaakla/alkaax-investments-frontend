@@ -23,7 +23,6 @@ export default function StockModal(props) {
     const createStock = () => {
         api.post('/stocks', {code: stockModel.code})
             .then((data) => {
-                console.log('sucesso', data);
                 refreshStocksList();
                 hideStockModal();
             }).catch(err => console.log('Não foi possível salvar ação', err));
@@ -32,7 +31,6 @@ export default function StockModal(props) {
     const editStock = () => {
         api.patch('/stocks', stockModel)
             .then((data) => {
-                console.log('sucesso', data);
                 refreshStocksList();
             }).catch(err => console.log('Não foi possível salvar ação', err));
         setStockModel({id: null, code: ""});
@@ -51,7 +49,9 @@ export default function StockModal(props) {
                     </TouchableOpacity>
                 </View>
                 <View style={styles.modalContent}>
-                    <TextInput style={styles.modalInput} defaultValue={stockModel.code} onChangeText={(value) => setStockModel({...stockModel, code: value})} placeholderTextColor={"#9b9fa3"} placeholder={"Stock code"} />
+                    <TextInput style={styles.modalInput} defaultValue={stockModel.code}
+                               onChangeText={(value) => setStockModel({...stockModel, code: value})}
+                               placeholderTextColor={"#9b9fa3"} placeholder={"Stock code"} />
                 </View>
                 <View style={styles.modalFooter}>
                     <TouchableOpacity style={styles.modalPrimaryBtn} onPress={() => saveStock()}>

@@ -5,6 +5,9 @@ import api from '../../../services/api';
 import StockModal from "../../../components/stockModal/StockModal";
 import Icon from 'react-native-vector-icons/Ionicons';
 
+import { COLORS } from "../../../global-styles/colors";
+import { STOCK_CARD_LIST } from "../../../global-styles/stock-card-list";
+
 import {Context} from "../../../context/context";
 
 export default function StockList() {
@@ -52,10 +55,10 @@ export default function StockList() {
                         />
                     }>
             {stocks.map(stock => (
-                <TouchableOpacity style={styles.stockCardContainer} key={stock.id}
+                <TouchableOpacity style={STOCK_CARD_LIST.stockCardListContainer} key={stock.id}
                                   onPress={() => openModal(stock)} onLongPress={() => showDeleteModal(stock)}>
-                    <Text style={styles.stockCardName}>{stock.code}</Text>
-                    <Text style={styles.stockCardQuotas}>cotas: {stock.quotas}</Text>
+                    <Text style={STOCK_CARD_LIST.stockCardListName}>{stock.code}</Text>
+                    <Text style={STOCK_CARD_LIST.stockCardListQuotas}>cotas: {stock.quotas}</Text>
                 </TouchableOpacity>
             ))}
         </ScrollView>
@@ -66,78 +69,59 @@ export default function StockList() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#04101e',
+        backgroundColor: COLORS.primaryDarkBackground,
         paddingVertical: 12
     },
-    stockCardContainer: {
-        backgroundColor: '#041b2d',
-        flexDirection: "row",
-        justifyContent: "space-between",
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        marginBottom: 8,
-        borderRadius: 8
-    },
-    stockCardName: {
-        color: '#deedf2',
-        fontSize: 18,
-        fontWeight: '600'
-    },
-    stockCardQuotas: {
-        color: '#deedf2',
-        fontSize: 16
-    },
-    greenColor: {color: '#00f400'},
-    redColor: {color: '#e80000'},
-    modalContainer: {
-        backgroundColor: '#041b2d',
-        paddingHorizontal: 24,
-        paddingVertical: 16,
-        width: '80%',
-        alignSelf: 'center',
-        borderRadius: 8
-    },
-    modalHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-    },
-    modalHeaderTitle: {
-        color: '#deedf2',
-        fontSize: 16,
-        fontWeight: '600'
-    },
-    modalHeaderIcon: {
-        color: '#deedf2',
-        fontSize: 18
-    },
-    modalContent: {
-        marginTop: 12,
-        marginBottom: 8
-    },
-    modalInput: {
-        backgroundColor: '#052844',
-        borderRadius: 8,
-        paddingHorizontal: 12,
-        paddingVertical: 5,
-        color: '#deedf2'
-    },
-    modalFooter: {
-        justifyContent: 'space-between',
-        alignItems: 'center'
-    },
-    modalPrimaryBtn: {
-        marginTop: 12,
-        alignSelf: 'flex-end',
-        borderRadius: 8,
-        backgroundColor: 'green',
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        minWidth: 68,
-    },
-    modalPrimaryBtnText: {
-        color: '#deedf2',
-        fontWeight: '600',
-        textAlign: 'center'
-    }
+
+    // modalContainer: {
+    //     backgroundColor: COLORS.secondaryDarkBackground,
+    //     paddingHorizontal: 24,
+    //     paddingVertical: 16,
+    //     width: '80%',
+    //     alignSelf: 'center',
+    //     borderRadius: 8
+    // },
+    // modalHeader: {
+    //     flexDirection: 'row',
+    //     justifyContent: 'space-between',
+    //     alignItems: 'center'
+    // },
+    // modalHeaderTitle: {
+    //     color: '#deedf2',
+    //     fontSize: 16,
+    //     fontWeight: '600'
+    // },
+    // modalHeaderIcon: {
+    //     color: '#deedf2',
+    //     fontSize: 18
+    // },
+    // modalContent: {
+    //     marginTop: 12,
+    //     marginBottom: 8
+    // },
+    // modalInput: {
+    //     backgroundColor: '#052844',
+    //     borderRadius: 8,
+    //     paddingHorizontal: 12,
+    //     paddingVertical: 5,
+    //     color: '#deedf2'
+    // },
+    // modalFooter: {
+    //     justifyContent: 'space-between',
+    //     alignItems: 'center'
+    // },
+    // modalPrimaryBtn: {
+    //     marginTop: 12,
+    //     alignSelf: 'flex-end',
+    //     borderRadius: 8,
+    //     backgroundColor: 'green',
+    //     paddingHorizontal: 12,
+    //     paddingVertical: 6,
+    //     minWidth: 68,
+    // },
+    // modalPrimaryBtnText: {
+    //     color: '#deedf2',
+    //     fontWeight: '600',
+    //     textAlign: 'center'
+    // }
 });
