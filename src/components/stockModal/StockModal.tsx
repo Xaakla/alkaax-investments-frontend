@@ -15,12 +15,13 @@ export default function StockModal(props) {
         setIsStockModalVisible(false);
         setStockModel({id: null, code: ""});
     };
-    
+
     useEffect(() => {
         console.log('props', props, stockModel);
     }, []);
 
     const createStock = () => {
+        console.log('create')
         api.post('/stocks', {code: stockModel.code})
             .then((data) => {
                 refreshStocksList();
@@ -37,7 +38,7 @@ export default function StockModal(props) {
         hideStockModal();
     }
 
-    const saveStock = () => props.isEdit ? createStock() : editStock();
+    const saveStock = () => props.isEdit ? editStock() : createStock();
 
     return (
         <Portal>
@@ -51,7 +52,7 @@ export default function StockModal(props) {
                 <View style={styles.modalContent}>
                     <TextInput style={styles.modalInput} defaultValue={stockModel.code}
                                onChangeText={(value) => setStockModel({...stockModel, code: value})}
-                               placeholderTextColor={"#9b9fa3"} placeholder={"Stock code"} />
+                               placeholderTextColor={"#9b9fa3"} placeholder={"Stock code"} maxLength={12} />
                 </View>
                 <View style={styles.modalFooter}>
                     <TouchableOpacity style={styles.modalPrimaryBtn} onPress={() => saveStock()}>

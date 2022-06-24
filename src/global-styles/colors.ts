@@ -7,7 +7,7 @@ export const COLORS = {
 
     whiteText: '#deedf2',
     blueText: '#1d5d94',
-    placeholderText: 'gray',
+    placeholderText: '#cacccd',
 
     green: '#00f400',
     red: '#e80000',

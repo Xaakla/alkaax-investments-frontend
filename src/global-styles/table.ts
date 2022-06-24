@@ -23,9 +23,16 @@ export const TABLE = StyleSheet.create({
     tableText: {
         color: COLORS.whiteText
     },
+    tableHeadCell: {
+        flex: 1
+    },
+    tableBodyCell: {
+        flex: 1
+    },
     tableHeadText: {
         fontSize: 16,
         fontWeight: '600',
+        color: COLORS.whiteText
     },
     tableBodyText: {
     },

@@ -9,6 +9,7 @@ import DividendList from "./dividend-list/DividendList";
 import InvestmentList from "./investment-list/InvestmentList";
 import StockModal from "../../components/stockModal/StockModal";
 import DeleteModal from "../../components/deleteModal/DeleteModal";
+import DeleteInvestmentMoveModal from "../../components/deleteInvestmentMoveModal/DeleteInvestmentMoveModal";
 
 import api from '../../services/api';
 
@@ -72,7 +73,7 @@ export default function Stocks({navigation}) {
                     <Tab.Screen name="Dividends" component={DividendList}/>
                 </Tab.Navigator>
 
-                <ActionButton buttonColor="rgba(231,76,60,1)">
+                <ActionButton buttonColor="rgba(231,76,60,.7)">
                     <ActionButton.Item buttonColor='#9b59b6' title="New Batch Dividend"
                                        onPress={() => navigation.navigate("NewBatchDividend")}>
                         <Icon name="md-create" style={styles.actionButtonIcon}/>
@@ -89,6 +90,7 @@ export default function Stocks({navigation}) {
 
             <StockModal isEdit={stockModel.id !== null}></StockModal>
             <DeleteModal></DeleteModal>
+            <DeleteInvestmentMoveModal></DeleteInvestmentMoveModal>
         </>
     );
 }
