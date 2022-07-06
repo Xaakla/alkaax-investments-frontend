@@ -1,67 +1,123 @@
 import React, {useEffect, useState, useContext} from 'react';
 import {StyleSheet, Text, TouchableOpacity, View, ScrollView, FlatList, RefreshControl, TextInput} from "react-native";
-import api from '../../../services/api';
-
-import StockModal from "../../../components/stockModal/StockModal";
 import Icon from 'react-native-vector-icons/Ionicons';
-
-import { COLORS } from "../../../global-styles/colors";
-import { STOCK_CARD_LIST } from "../../../global-styles/stock-card-list";
-
+import {COLORS} from "../../../global-styles/colors";
+import {STOCK_CARD_LIST} from "../../../global-styles/stock-card-list";
+import {MODAL} from "../../../global-styles/modal";
+import {IStockModel} from "../../../interfaces";
 import {Context} from "../../../context/context";
+import api from '../../../services/api';
+import {Modal as ModalContainer, Portal, Provider} from 'react-native-paper';
+import AppModal from '../../../components/AppModal';
+
+const wait = (timeout) => {
+    return new Promise(resolve => setTimeout(resolve, timeout));
+}
 
 export default function StockList() {
+    const [refreshing, setRefreshing] = useState(false);
+    const refresh = React.useCallback(() => {
+        setRefreshing(true);
+        wait(2000).then(() => setRefreshing(false));
+    }, []);
 
-    const {setStocks, stocks, stocksRefreshing, setStocksRefreshing, refreshStocksList,
-        isStockModalVisible, setIsStockModalVisible, stockModel, setStockModel,
-        setIsDeleteModalVisible, setTitleDeleteModal} = useContext(Context);
+    const [stocks, setStocks] = useState([]);
+    const [stockModel, setStockModel] = useState<IStockModel>({id: null, code: ""});
 
-    const showStockModal = () => setIsStockModalVisible(true);
-    const hideStockModal = () => setIsStockModalVisible(false);
+    const [isStockDelModalVisible, setIsStockDelModalVisible] = useState(false);
+    const showStockDelModal = (stock: any) => {
+        setStockModel(stock);
+        setIsStockDelModalVisible(true);
+    };
+    const hideStockDelModal = () => setIsStockDelModalVisible(false);
 
-    const showDeleteModal = (stock: any) => {
-        setStockModel(stock)
-        setTitleDeleteModal("Tem certeza que deseja deletar a ação '"+stock.code+"'?");
-        setIsDeleteModalVisible(true);
+    const [isStockEditModalVisible, setIsStockEditModalVisible] = useState(false);
+    const showStockEditModal = (stock: any) => {
+        setStockModel(stock);
+        setIsStockEditModalVisible(true);
     }
+    const hideStockEditModal = () => setIsStockEditModalVisible(false);
 
     useEffect(() => {
         api.get('/stocks').then(response => {
             setStocks(response?.data);
         }).catch(error => console.error('Items não armazenados no estado: ', error));
-    }, [stocksRefreshing]);
+    }, [refreshing]);
 
-    function editStock() {
+    function handleEditStock() {
         api.patch('/stocks', stockModel)
-            .then((data) => {
-                refreshStocksList();
-            }).catch(err => console.error('Não foi possível salvar ação', err));
-        setStockModel({id: null, code: ''});
-        hideStockModal();
+            .then((data) => refresh())
+            .catch(err => console.error('Não foi possível salvar ação', err));
+        hideStockEditModal();
     }
 
-    function openModal(stock: any) {
-        setStockModel(stock);
-        showStockModal();
+    const handleDeleteStock = () => {
+        api.delete(`/stocks/${stockModel?.id}`)
+            .then((response) => {
+                refresh();
+                setIsStockEditModalVisible(false);
+            }).catch(error => console.error("[STOCKS] - " + error));
     }
 
     return (
         <>
-        <ScrollView style={styles.container}
-                    refreshControl={
-                        <RefreshControl
-                            refreshing={stocksRefreshing}
-                            onRefresh={refreshStocksList}
-                        />
-                    }>
-            {stocks.map(stock => (
-                <TouchableOpacity style={STOCK_CARD_LIST.stockCardListContainer} key={stock.id}
-                                  onPress={() => openModal(stock)} onLongPress={() => showDeleteModal(stock)}>
-                    <Text style={STOCK_CARD_LIST.stockCardListName}>{stock.code}</Text>
-                    <Text style={STOCK_CARD_LIST.stockCardListQuotas}>cotas: {stock.quotas}</Text>
-                </TouchableOpacity>
-            ))}
-        </ScrollView>
+            <ScrollView style={styles.container}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={refreshing}
+                                onRefresh={refresh}
+                            />
+                        }>
+                {stocks.map(stock => (
+                    <TouchableOpacity style={STOCK_CARD_LIST.stockCardListContainer} key={stock.id}
+                                      onPress={() => showStockEditModal(stock)}
+                                      onLongPress={() => showStockDelModal(stock)}>
+                        <Text style={STOCK_CARD_LIST.stockCardListName}>{stock.code}</Text>
+                        <Text style={STOCK_CARD_LIST.stockCardListQuotas}>cotas: {stock.quotas}</Text>
+                    </TouchableOpacity>
+                ))}
+            </ScrollView>
+
+            <AppModal>
+                <ModalContainer visible={isStockDelModalVisible} onDismiss={hideStockDelModal}>
+                    <View style={MODAL.modalContainer}>
+                        <View style={MODAL.modalHeader}>
+                            <Text style={MODAL.modalHeaderTitle}>Teste Titulo</Text>
+                        </View>
+                        <View style={MODAL.modalFooter}>
+                            <TouchableOpacity style={MODAL.modalSecondaryBtn} onPress={() => hideStockDelModal()}>
+                                <Text style={MODAL.modalSecondaryBtnText}>Cancelar</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={MODAL.modalPrimaryBtn} onPress={() => handleDeleteStock()}>
+                                <Text style={MODAL.modalPrimaryBtnText}>Confirmar</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </ModalContainer>
+            </AppModal>
+
+            <AppModal>
+                <ModalContainer visible={isStockEditModalVisible} onDismiss={hideStockEditModal}>
+                    <View style={MODAL.modalContainer}>
+                        <View style={MODAL.modalHeader}>
+                            <Text style={MODAL.modalHeaderTitle}>Edit Stock</Text>
+                            <TouchableOpacity onPress={hideStockEditModal}>
+                                <Icon name="md-close" style={[MODAL.modalHeaderIcon, MODAL.redColor]}/>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={MODAL.modalContent}>
+                            <TextInput style={MODAL.modalInput} defaultValue={stockModel.code}
+                                       onChangeText={(value) => setStockModel({...stockModel, code: value})}
+                                       placeholderTextColor={"#9b9fa3"} placeholder={"Stock code"} maxLength={12}/>
+                        </View>
+                        <View style={MODAL.modalFooter}>
+                            <TouchableOpacity style={MODAL.modalPrimaryBtn} onPress={handleEditStock}>
+                                <Text style={MODAL.modalPrimaryBtnText}>Save</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </ModalContainer>
+            </AppModal>
         </>
     );
 }

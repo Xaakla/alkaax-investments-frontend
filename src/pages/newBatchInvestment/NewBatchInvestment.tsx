@@ -35,7 +35,6 @@ export default function NewBatchInvestment({ navigation }) {
     useEffect(() => {
         api.get("/stocks")
             .then((response) => {
-                console.log(response.data);
                 setStocks(response.data);
             }).catch(err => console.error("[GET] - "+err));
     }, []);
@@ -101,44 +100,6 @@ export default function NewBatchInvestment({ navigation }) {
         setTotalQuotas(calculateTotalQuotas());
     }, [investmentMoves]);
 
-    const onSubmit = () => {
-          if (newBatchInvestment.trim() === '' || newBatchInvestment === null || newBatchInvestment === undefined) {
-              console.error('[ERROR] - Nome do lote de investimento inválido!');
-              return;
-          }
-
-          let hasErrors = false;
-          investmentMoves.forEach(it => {
-              if (it.stockId === null) {
-                  hasErrors = true;
-                  return console.error('[ERROR] - Stock ID inválido');
-              }
-              if (it.status !== 'BUY' && it.status !== 'SELL') {
-                  hasErrors = true;
-                  return console.error('[ERROR] - Status do movimento é inválido');
-              }
-              if (it.price < 0) {
-                  hasErrors = true;
-                  return console.error('[ERROR] - Preço inválido')
-              }
-              if (it.quantity <= 0) {
-                  hasErrors = true;
-                  console.error('[ERROR] - Cotas inválidas');
-                  return;
-              }
-          });
-
-          if (hasErrors) return;
-
-          createNewBatchInvestment()
-              .then((response: any) => {
-                  investmentMoves.map(it => it.batchInvestmentId = response.id);
-                  createInvestmentMoves().then(() => {
-                      navigation.navigate("Investments");
-                  }).catch(() => console.error('[POST] - Erro ao salvar movimentos de investimento'));
-              }).catch(() => console.error('[POST] - Não foi possível criar o lote.'));
-    };
-
     const createNewBatchInvestment = () => new Promise((resolve, reject) => {
         api.post('/batch-investments', {name: newBatchInvestment})
             .then((response) => resolve(response.data)).catch(() => reject(false));
@@ -149,14 +110,51 @@ export default function NewBatchInvestment({ navigation }) {
             .then(() => resolve(true)).catch(() => reject(false));
     });
 
+    const onSubmit = () => {
+        if (newBatchInvestment.trim() === '' || newBatchInvestment === null || newBatchInvestment === undefined) {
+            console.error('[ERROR] - Nome do lote de investimento inválido!');
+            return;
+        }
+
+        let hasErrors = false;
+        investmentMoves.forEach(it => {
+            if (it.stockId === null) {
+                hasErrors = true;
+                return console.error('[ERROR] - Stock ID inválido');
+            }
+            if (it.status !== 'BUY' && it.status !== 'SELL') {
+                hasErrors = true;
+                return console.error('[ERROR] - Status do movimento é inválido');
+            }
+            if (it.price < 0) {
+                hasErrors = true;
+                return console.error('[ERROR] - Preço inválido')
+            }
+            if (it.quantity <= 0) {
+                hasErrors = true;
+                console.error('[ERROR] - Cotas inválidas');
+                return;
+            }
+        });
+
+        if (hasErrors) return;
+
+        createNewBatchInvestment()
+            .then((response: any) => {
+                investmentMoves.map(it => it.batchInvestmentId = response.id);
+                createInvestmentMoves().then(() => {
+                    navigation.navigate("Investments");
+                }).catch(() => console.error('[POST] - Erro ao salvar movimentos de investimento'));
+            }).catch(() => console.error('[POST] - Não foi possível criar o lote.'));
+    };
+
     return (
         <View style={styles.container}>
             <View style={[styles.row]}>
                 <TextInput style={BATCH_STYLES.textInput} defaultValue={newBatchInvestment}
-                   onChangeText={((value) => setNewBatchInvestment(value))}
+                   onChangeText={(value) => setNewBatchInvestment(value)}
                    placeholder={"Nome do lote de investimentos"} placeholderTextColor={COLORS.placeholderText} />
             </View>
-
 
             <View style={styles.tableContainer}>
                 <View style={styles.row}>

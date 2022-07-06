@@ -7,34 +7,26 @@ import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs
 import StockList from "./stock-list/StockList";
 import DividendList from "./dividend-list/DividendList";
 import InvestmentList from "./investment-list/InvestmentList";
-import StockModal from "../../components/stockModal/StockModal";
-import DeleteModal from "../../components/deleteModal/DeleteModal";
-import DeleteInvestmentMoveModal from "../../components/deleteInvestmentMoveModal/DeleteInvestmentMoveModal";
 
 import api from '../../services/api';
 
 import {Context} from "../../context/context";
 
-import {Modal, Portal} from 'react-native-paper';
+import AppModal from "../../components/AppModal";
+import {Modal as ModalContainer} from 'react-native-paper';
+import { MODAL } from "../../global-styles/modal";
 
 const Tab = createMaterialTopTabNavigator();
 
 export default function Stocks({navigation}) {
-
-    const {stocksRefreshing, setStocksRefreshing, stocks, setStocks,
-        refreshStocksList, isStockModalVisible, setIsStockModalVisible,
-        stockModel} = useContext(Context);
-
-    const showStockModal = () => setIsStockModalVisible(true);
-    const hideStockModal = () => setIsStockModalVisible(false);
-
     const [newStockCode, setNewStockCode] = useState("");
-
-    function createStock() {
+    const [isStockNewModalVisible, setStockNewModalVisible] = useState(false);
+    const showStockNewModel = () => setStockNewModalVisible(true);
+    const hideStockNewModal = () => setStockNewModalVisible(false);
+    const handleCreateStock = () => {
         api.post('/stocks', {code: newStockCode})
             .then((data) => {
-                refreshStocksList();
-                hideStockModal();
+                hideStockNewModal();
             }).catch(err => console.error('Não foi possível salvar ação', err))
     }
 
@@ -82,15 +74,35 @@ export default function Stocks({navigation}) {
                                        onPress={() => navigation.navigate("NewBatchInvestment")}>
                         <Icon name="md-notifications-off" style={styles.actionButtonIcon}/>
                     </ActionButton.Item>
-                    <ActionButton.Item buttonColor='#1abc9c' title="New Stock" onPress={showStockModal}>
+                    <ActionButton.Item buttonColor='#1abc9c' title="New Stock" onPress={showStockNewModel}>
                         <Icon name="md-create" style={styles.actionButtonIcon}/>
                     </ActionButton.Item>
                 </ActionButton>
             </View>
 
-            <StockModal isEdit={stockModel.id !== null}></StockModal>
-            <DeleteModal></DeleteModal>
-            <DeleteInvestmentMoveModal></DeleteInvestmentMoveModal>
+            <AppModal>
+                <ModalContainer visible={isStockNewModalVisible} onDismiss={hideStockNewModal} style={MODAL.modalContainer}>
+                    <View style={MODAL.modalHeader}>
+                        <Text style={MODAL.modalHeaderTitle}>Edit Stock</Text>
+                        <TouchableOpacity onPress={hideStockNewModal}>
+                            <Icon name="md-close" style={[MODAL.modalHeaderIcon, MODAL.redColor]} />
+                        </TouchableOpacity>
+                    </View>
+                    <View style={MODAL.modalContent}>
+                        <TextInput style={MODAL.modalInput} maxLength={12}
+                                   onChangeText={(value) => setNewStockCode(value)}
+                                   placeholderTextColor={"#9b9fa3"} placeholder={"Stock code"} />
+                    </View>
+                    <View style={MODAL.modalFooter}>
+                        <TouchableOpacity style={MODAL.modalPrimaryBtn} onPress={handleCreateStock}>
+                            <Text style={MODAL.modalPrimaryBtnText}>Save</Text>
+                        </TouchableOpacity>
+                    </View>
+                </ModalContainer>
+            </AppModal>
+
+            {/*<StockModal isEdit={stockModel.id !== null}></StockModal>*/}
+            {/*<DeleteInvestmentMoveModal></DeleteInvestmentMoveModal>*/}
         </>
     );
 }
