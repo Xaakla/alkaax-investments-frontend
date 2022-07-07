@@ -11,6 +11,7 @@ import Home from "./src/pages/home/Home";
 import Stocks from "./src/pages/stocks/Stocks";
 import NewBatchInvestment from "./src/pages/newBatchInvestment/NewBatchInvestment";
 import NewBatchDividend from "./src/pages/newBatchDividend/NewBatchDividend";
+import StockDetails from './src/pages/stockDetails';
 
 import ContextProvider from './src/context/context';
 
@@ -48,6 +49,13 @@ export default function App() {
               component={NewBatchDividend}
               options={{
                 title: 'New Batch Dividend',
+              }}
+            />
+            <Stack.Screen
+              name="StockDetails"
+              component={StockDetails}
+              options={{
+                title: 'Stock Details'
               }}
             />
           </Stack.Navigator>

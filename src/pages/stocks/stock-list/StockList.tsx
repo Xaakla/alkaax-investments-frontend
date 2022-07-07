@@ -14,7 +14,7 @@ const wait = (timeout) => {
     return new Promise(resolve => setTimeout(resolve, timeout));
 }
 
-export default function StockList() {
+export default function StockList({navigation}) {
     const [refreshing, setRefreshing] = useState(false);
     const refresh = React.useCallback(() => {
         setRefreshing(true);
@@ -59,6 +59,8 @@ export default function StockList() {
             }).catch(error => console.error("[STOCKS] - " + error));
     }
 
+    const gotoStockDetails = (stockId) => navigation.navigate("StockDetails", stockId)
+
     return (
         <>
             <ScrollView style={styles.container}
@@ -70,7 +72,7 @@ export default function StockList() {
                         }>
                 {stocks.map(stock => (
                     <TouchableOpacity style={STOCK_CARD_LIST.stockCardListContainer} key={stock.id}
-                                      onPress={() => showStockEditModal(stock)}
+                                      onPress={() => gotoStockDetails(stock.id)}
                                       onLongPress={() => showStockDelModal(stock)}>
                         <Text style={STOCK_CARD_LIST.stockCardListName}>{stock.code}</Text>
                         <Text style={STOCK_CARD_LIST.stockCardListQuotas}>cotas: {stock.quotas}</Text>
