@@ -10,34 +10,48 @@ import { BUTTON } from "../../global-styles/button";
 import { COLORS } from "../../global-styles/colors";
 import api from "../../services/api";
 
-export default function NewBatchInvestment({ navigation }) {
+export default function NewBatchInvestment({ navigation, route }) {
 
-    const [newBatchInvestment, setNewBatchInvestment] = useState<string>("");
-    const [investmentMoves, setInvestmentMoves] = useState([{
-        quantity: 0,
-        price: 0,
-        status: 'BUY',
-        stockId: null,
-        batchInvestmentId: null
-    }]);
+    const [newBatchInvestment, setNewBatchInvestment] = useState<string>(route?.params?.batch?.name || "");
+    const [investmentMoves, setInvestmentMoves] = useState([]);
     const [stocks, setStocks] = useState([]);
     const [totalPrice, setTotalPrice] = useState(0);
     const [totalQuotas, setTotalQuotas] = useState(0);
-
-    const tableHead = ['Qtd', 'Name', 'Price'];
-    const tableBody = [
-        ['4', 'RECR11', 'R$1,20'],
-        ['1', 'CPTS11', 'R$1,05'],
-        ['2', 'OUJP11', 'R$1,92'],
-        ['6', 'KNSC11', 'R$1,71']
-    ];
 
     useEffect(() => {
         api.get("/stocks")
             .then((response) => {
                 setStocks(response.data);
+                handleInvestmentMoves();
             }).catch(err => console.error("[GET] - "+err));
     }, []);
+
+    const handleInvestmentMoves = () => {
+        if (!route?.params?.batch?.moves) {
+            setInvestmentMoves([{
+                quantity: 0,
+                price: 0,
+                status: 'BUY',
+                stockId: null,
+                batchInvestmentId: null
+            }]);
+            return;
+        }
+
+        const newInvestmentMoves = [];
+        route?.params?.batch?.moves.map(it => {
+            newInvestmentMoves.push({
+                id: it.id,
+                quantity: it.quantity,
+                price: it.price,
+                status: it.status,
+                stockId: it.stock.id,
+                batchInvestmentId: it.batchInvestment.id
+            });
+        });
+
+        setInvestmentMoves(newInvestmentMoves);
+    }
 
     const changePrice = (value: number, index: number) => {
         const temp = investmentMoves;
@@ -101,7 +115,7 @@ export default function NewBatchInvestment({ navigation }) {
     }, [investmentMoves]);
 
     const createNewBatchInvestment = () => new Promise((resolve, reject) => {
-        api.post('/batch-investments', {name: newBatchInvestment})
+        api.post('/batch-investments', {id: route?.params?.batch?.id, name: newBatchInvestment})
             .then((response) => resolve(response.data)).catch(() => reject(false));
     });
 

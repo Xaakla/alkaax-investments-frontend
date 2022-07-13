@@ -3,12 +3,13 @@ import {Text, View, ScrollView, StyleSheet, TouchableOpacity, RefreshControl} fr
 import { COLORS } from "../../../global-styles/colors";
 import { HISTORIC_CARD } from "../../../global-styles/historic-card";
 import api from "../../../services/api";
+import Icon from 'react-native-vector-icons/Feather';
 
 const wait = (timeout) => {
     return new Promise(resolve => setTimeout(resolve, timeout));
 }
 
-export default function InvestmentList() {
+export default function InvestmentList({navigation}) {
 
     const [investments, setInvestments] = useState([]);
     const [investmentsRefreshing, setInvestmentsRefreshing] = useState(false);
@@ -29,6 +30,8 @@ export default function InvestmentList() {
         moves.filter(it => it.status === status).forEach(it => qtd += it.quantity);
         return qtd;
     };
+    
+    const handleEditBatch = (batch: any) => navigation.navigate("NewBatchInvestment", {batch});
 
     return (
         <>
@@ -43,7 +46,15 @@ export default function InvestmentList() {
             {investments.map((investment, index) => (
                 <View style={HISTORIC_CARD.historicCard} key={`batchInvestment-${investment.name}-${index}-${investment.id}`}>
                     <View style={HISTORIC_CARD.historicCardHeader}>
-                        <Text style={HISTORIC_CARD.historicTitleText}>{investment.name}</Text>
+                        <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+                            <Text style={HISTORIC_CARD.historicTitleText}>{investment.name}</Text>
+                            <Icon.Button
+                                name="edit"
+                                size={16}
+                                backgroundColor="transparent"
+                                onPress={() => handleEditBatch(investment)}>
+                            </Icon.Button>
+                        </View>
                         <Text style={HISTORIC_CARD.historicPriceText}>R$ {investment.total}</Text>
                     </View>
                     <View style={HISTORIC_CARD.historicCardBody}>

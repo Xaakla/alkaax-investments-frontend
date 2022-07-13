@@ -6,7 +6,8 @@ export const INFO_BOX = StyleSheet.create({
         backgroundColor: COLORS.secondaryDarkBackground,
         paddingHorizontal: 14,
         paddingVertical: 12,
-        borderRadius: 8
+        borderRadius: 8,
+        marginBottom: 24
     },
     infoBoxView: {
         borderColor: COLORS.blue,
@@ -29,6 +30,12 @@ export const INFO_BOX = StyleSheet.create({
         color: COLORS.whiteText,
         fontSize: 24,
         fontWeight: '700'
+    },
+    infoBoxTextInput: {
+        color: COLORS.whiteText,
+        fontSize: 24,
+        fontWeight: '700',
+
     },
     infoBoxFooterText: {
         color: COLORS.whiteText,

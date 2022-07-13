@@ -9,15 +9,10 @@ import { BUTTON } from "../../global-styles/button";
 import { COLORS } from "../../global-styles/colors";
 import api from "../../services/api";
 
-export default function NewBatchDividend({ navigation }) {
+export default function NewBatchDividend({ navigation, route }) {
 
-    const [newBatchDividend, setNewBatchDividend] = useState<string>("");
-    const [divMoves, setDivMoves] = useState([{
-        quantity: 0,
-        price: 0,
-        stockId: null,
-        batchDividendId: null
-    }]);
+    const [newBatchDividend, setNewBatchDividend] = useState<string>(route?.params?.batch?.name || "");
+    const [divMoves, setDivMoves] = useState([]);
     const [stocks, setStocks] = useState([]);
     const [totalPrice, setTotalPrice] = useState(0);
     const [totalQuotas, setTotalQuotas] = useState(0);
@@ -26,8 +21,35 @@ export default function NewBatchDividend({ navigation }) {
         api.get("/stocks")
             .then((response) => {
                 setStocks(response.data);
+                console.log('alo', route?.params?.batch?.moves)
+                handleDividendMoves();
             }).catch(err => console.error("[GET] - "+err));
     }, []);
+
+    const handleDividendMoves = () => {
+        if (!route?.params?.batch?.moves) {
+            setDivMoves([{
+                quantity: 0,
+                price: 0,
+                stockId: null,
+                batchDividendId: null
+            }]);
+            return;
+        }
+
+        const newDividendMoves = [];
+        route?.params?.batch?.moves.map(it => {
+            newDividendMoves.push({
+                id: it.id,
+                quantity: it.quantity,
+                price: it.price,
+                stockId: it.stock.id,
+                batchDividendId: it.batchDividend.id
+            });
+        });
+
+        setDivMoves(newDividendMoves);
+    }
 
     const newMove = () => {
         setDivMoves([...divMoves, {
@@ -83,7 +105,7 @@ export default function NewBatchDividend({ navigation }) {
     });
 
     const createNewBatchDividend = () => new Promise((resolve, reject) => {
-        api.post('/batch-dividends', {name: newBatchDividend})
+        api.post('/batch-dividends', {id: route?.params?.batch?.id,name: newBatchDividend})
             .then((response) => resolve(response.data)).catch(() => reject(false));
     });
 

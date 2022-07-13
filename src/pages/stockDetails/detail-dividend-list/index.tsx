@@ -26,12 +26,12 @@ export default function DetailDividendList({navigation, route}) {
 
     return (
         <ScrollView style={styles.container}
-                    refreshControl={
-                        <RefreshControl
-                            refreshing={dividendsRefreshing}
-                            onRefresh={refreshDividendList}
-                        />
-                    }
+            refreshControl={
+                <RefreshControl
+                    refreshing={dividendsRefreshing}
+                    onRefresh={refreshDividendList}
+                />
+            }
         >
             {dividends.map((div, index) => (
                 <View style={HISTORIC_CARD.historicCard} key={`batchDividend-${div.name}-${index}-${div.id}`}>

@@ -15,6 +15,8 @@ import {Context} from "../../context/context";
 import AppModal from "../../components/AppModal";
 import {Modal as ModalContainer} from 'react-native-paper';
 import { MODAL } from "../../global-styles/modal";
+import { INFO_BOX } from "../../global-styles/info-box";
+import { COLORS } from "../../global-styles/colors";
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -33,22 +35,22 @@ export default function Stocks({navigation}) {
     return (
         <>
             <View style={styles.container}>
-                <View style={styles.balanceHeaderView}>
-                    <View style={styles.balanceView}>
-                        <Text style={styles.balanceLabelText}>Saldo total:</Text>
-                        <Text style={styles.balanceText}>
+                <View style={INFO_BOX.infoBoxHeaderView}>
+                    <View style={INFO_BOX.infoBoxView}>
+                        <Text style={INFO_BOX.infoBoxLabelText}>Saldo total:</Text>
+                        <Text style={INFO_BOX.infoBoxText}>
                             R$ 13.599,50
-                            <Text style={[styles.balanceFooterInfoText, styles.greenColor]}> +R$ 1.104,75</Text>
+                            <Text style={[INFO_BOX.infoBoxFooterInfoText, {color: COLORS.green}]}> +R$ 1.104,75</Text>
                         </Text>
                     </View>
-                    <View style={styles.balanceFooter}>
+                    <View style={INFO_BOX.infoBoxFooter}>
                         <View>
-                            <Text style={styles.balanceLabelText}>Média investido/mês:</Text>
-                            <Text style={styles.balanceFooterText}>R$ 2.000,00</Text>
+                            <Text style={INFO_BOX.infoBoxLabelText}>Média investido/mês:</Text>
+                            <Text style={INFO_BOX.infoBoxFooterText}>R$ 2.000,00</Text>
                         </View>
                         <View>
-                            <Text style={styles.balanceLabelText}>Média rendimento/mês:</Text>
-                            <Text style={styles.balanceFooterText}>R$ 125,54</Text>
+                            <Text style={INFO_BOX.infoBoxLabelText}>Média rendimento/mês:</Text>
+                            <Text style={INFO_BOX.infoBoxFooterText}>R$ 125,54</Text>
                         </View>
                     </View>
                 </View>
