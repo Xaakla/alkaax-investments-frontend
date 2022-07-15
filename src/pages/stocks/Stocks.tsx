@@ -21,6 +21,11 @@ import { COLORS } from "../../global-styles/colors";
 const Tab = createMaterialTopTabNavigator();
 
 export default function Stocks({navigation}) {
+
+    const [totalBalance, setTotalBalance] = useState(0);
+    const [totalInvestment, setTotalInvestment] = useState(0);
+    const [totalDividend, setTotalDividend] = useState(0);
+
     const [newStockCode, setNewStockCode] = useState("");
     const [isStockNewModalVisible, setStockNewModalVisible] = useState(false);
     const showStockNewModel = () => setStockNewModalVisible(true);
@@ -29,8 +34,26 @@ export default function Stocks({navigation}) {
         api.post('/stocks', {code: newStockCode})
             .then((data) => {
                 hideStockNewModal();
-            }).catch(err => console.error('Não foi possível salvar ação', err))
+            }).catch(err => console.error('Não foi possível salvar ação', err));
     }
+
+    useEffect(() => {
+        api.get('/balance-info/variable-income-total-balance')
+            .then((response) => {
+                setTotalBalance(response.data);
+            }).catch(err => console.error('Erro no request', err));
+
+        api.get('/balance-info/variable-income-investment')
+            .then((response) => {
+                setTotalInvestment(response.data);
+            }).catch(err => console.error('Erro no request', err));
+
+        api.get('/balance-info/variable-income-dividend')
+            .then((response) => {
+                setTotalDividend(response.data);
+            }).catch(err => console.error('Erro no request', err));
+    }, []);
+
 
     return (
         <>
@@ -39,18 +62,18 @@ export default function Stocks({navigation}) {
                     <View style={INFO_BOX.infoBoxView}>
                         <Text style={INFO_BOX.infoBoxLabelText}>Saldo total:</Text>
                         <Text style={INFO_BOX.infoBoxText}>
-                            R$ 13.599,50
-                            <Text style={[INFO_BOX.infoBoxFooterInfoText, {color: COLORS.green}]}> +R$ 1.104,75</Text>
+                            R$ {totalBalance}
+                            {/*<Text style={[INFO_BOX.infoBoxFooterInfoText, {color: COLORS.green}]}> +R$ 1.104,75</Text>*/}
                         </Text>
                     </View>
                     <View style={INFO_BOX.infoBoxFooter}>
                         <View>
-                            <Text style={INFO_BOX.infoBoxLabelText}>Média investido/mês:</Text>
-                            <Text style={INFO_BOX.infoBoxFooterText}>R$ 2.000,00</Text>
+                            <Text style={INFO_BOX.infoBoxLabelText}>Total investido:</Text>
+                            <Text style={INFO_BOX.infoBoxFooterText}>R$ {totalInvestment}</Text>
                         </View>
                         <View>
-                            <Text style={INFO_BOX.infoBoxLabelText}>Média rendimento/mês:</Text>
-                            <Text style={INFO_BOX.infoBoxFooterText}>R$ 125,54</Text>
+                            <Text style={INFO_BOX.infoBoxLabelText}>Total rendimentos:</Text>
+                            <Text style={INFO_BOX.infoBoxFooterText}>R$ {totalDividend}</Text>
                         </View>
                     </View>
                 </View>

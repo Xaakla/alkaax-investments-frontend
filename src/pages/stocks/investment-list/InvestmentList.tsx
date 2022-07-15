@@ -4,6 +4,7 @@ import { COLORS } from "../../../global-styles/colors";
 import { HISTORIC_CARD } from "../../../global-styles/historic-card";
 import api from "../../../services/api";
 import Icon from 'react-native-vector-icons/Feather';
+import { maskCurrency } from '../../../services/helpers';
 
 const wait = (timeout) => {
     return new Promise(resolve => setTimeout(resolve, timeout));
