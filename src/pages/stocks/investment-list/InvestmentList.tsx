@@ -56,14 +56,14 @@ export default function InvestmentList({navigation}) {
                                 onPress={() => handleEditBatch(investment)}>
                             </Icon.Button>
                         </View>
-                        <Text style={HISTORIC_CARD.historicPriceText}>R$ {investment.total}</Text>
+                        <Text style={[HISTORIC_CARD.historicPriceText, {color: investment.total > 0 ? COLORS.green : COLORS.red}]}>R$ {investment.total}</Text>
                     </View>
                     <View style={HISTORIC_CARD.historicCardBody}>
                         {investment.moves.map((move, index) => (
                             <TouchableOpacity style={HISTORIC_CARD.historicCardItem} key={`moveInvestment-${move.id}`} onLongPress={() => {}}>
                                 <Text style={HISTORIC_CARD.historicCardItemName}>{move.quantity} - {move.stock.code}</Text>
                                 <Text style={HISTORIC_CARD.historicCardItemUntPrice}>R$ {move.price}</Text>
-                                <Text style={HISTORIC_CARD.historicCardItemTotalPrice}>R$ {move.price * move.quantity}</Text>
+                                <Text style={{color: move.status === "BUY" ? COLORS.green : COLORS.red}}>R$ {move.price * move.quantity}</Text>
                             </TouchableOpacity>
                         ))}
                         <View style={HISTORIC_CARD.historicCardFooter}>

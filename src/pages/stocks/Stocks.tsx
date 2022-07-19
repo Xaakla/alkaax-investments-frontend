@@ -21,8 +21,10 @@ import { COLORS } from "../../global-styles/colors";
 const Tab = createMaterialTopTabNavigator();
 
 export default function Stocks({navigation}) {
+    const { stockGlobalRefreshing, setStockGlobalRefreshing } = useContext(Context);
 
     const [totalBalance, setTotalBalance] = useState(0);
+    const [totalStocks, setTotalStocks] = useState(0);
     const [totalInvestment, setTotalInvestment] = useState(0);
     const [totalDividend, setTotalDividend] = useState(0);
 
@@ -33,6 +35,7 @@ export default function Stocks({navigation}) {
     const handleCreateStock = () => {
         api.post('/stocks', {code: newStockCode})
             .then((data) => {
+                setStockGlobalRefreshing(true);
                 hideStockNewModal();
             }).catch(err => console.error('Não foi possível salvar ação', err));
     }
@@ -52,7 +55,14 @@ export default function Stocks({navigation}) {
             .then((response) => {
                 setTotalDividend(response.data);
             }).catch(err => console.error('Erro no request', err));
-    }, []);
+
+        api.get('/balance-info/stocks-quantity')
+            .then((response) => {
+                setTotalStocks(response.data);
+            }).catch(err => console.error('Erro no request', err));
+
+        setStockGlobalRefreshing(false);
+    }, [stockGlobalRefreshing]);
 
 
     return (
@@ -62,18 +72,22 @@ export default function Stocks({navigation}) {
                     <View style={INFO_BOX.infoBoxView}>
                         <Text style={INFO_BOX.infoBoxLabelText}>Saldo total:</Text>
                         <Text style={INFO_BOX.infoBoxText}>
-                            R$ {totalBalance}
+                            R$ {totalBalance.toFixed(2)}
                             {/*<Text style={[INFO_BOX.infoBoxFooterInfoText, {color: COLORS.green}]}> +R$ 1.104,75</Text>*/}
                         </Text>
                     </View>
                     <View style={INFO_BOX.infoBoxFooter}>
                         <View>
+                            <Text style={INFO_BOX.infoBoxLabelText}>Total ações:</Text>
+                            <Text style={INFO_BOX.infoBoxFooterText}>{totalStocks}</Text>
+                        </View>
+                        <View>
                             <Text style={INFO_BOX.infoBoxLabelText}>Total investido:</Text>
-                            <Text style={INFO_BOX.infoBoxFooterText}>R$ {totalInvestment}</Text>
+                            <Text style={INFO_BOX.infoBoxFooterText}>R$ {totalInvestment.toFixed(2)}</Text>
                         </View>
                         <View>
                             <Text style={INFO_BOX.infoBoxLabelText}>Total rendimentos:</Text>
-                            <Text style={INFO_BOX.infoBoxFooterText}>R$ {totalDividend}</Text>
+                            <Text style={INFO_BOX.infoBoxFooterText}>R$ {totalDividend.toFixed(2)}</Text>
                         </View>
                     </View>
                 </View>
@@ -106,22 +120,24 @@ export default function Stocks({navigation}) {
             </View>
 
             <AppModal>
-                <ModalContainer visible={isStockNewModalVisible} onDismiss={hideStockNewModal} style={MODAL.modalContainer}>
-                    <View style={MODAL.modalHeader}>
-                        <Text style={MODAL.modalHeaderTitle}>Edit Stock</Text>
-                        <TouchableOpacity onPress={hideStockNewModal}>
-                            <Icon name="md-close" style={[MODAL.modalHeaderIcon, MODAL.redColor]} />
-                        </TouchableOpacity>
-                    </View>
-                    <View style={MODAL.modalContent}>
-                        <TextInput style={MODAL.modalInput} maxLength={12}
-                                   onChangeText={(value) => setNewStockCode(value)}
-                                   placeholderTextColor={"#9b9fa3"} placeholder={"Stock code"} />
-                    </View>
-                    <View style={MODAL.modalFooter}>
-                        <TouchableOpacity style={MODAL.modalPrimaryBtn} onPress={handleCreateStock}>
-                            <Text style={MODAL.modalPrimaryBtnText}>Save</Text>
-                        </TouchableOpacity>
+                <ModalContainer visible={isStockNewModalVisible} onDismiss={hideStockNewModal}>
+                    <View style={MODAL.modalContainer}>
+                        <View style={MODAL.modalHeader}>
+                            <Text style={MODAL.modalHeaderTitle}>Edit Stock</Text>
+                            <TouchableOpacity onPress={hideStockNewModal}>
+                                <Icon name="md-close" style={[MODAL.modalHeaderIcon, MODAL.redColor]} />
+                            </TouchableOpacity>
+                        </View>
+                        <View style={MODAL.modalContent}>
+                            <TextInput style={MODAL.modalInput} maxLength={12}
+                                       onChangeText={(value) => setNewStockCode(value)}
+                                       placeholderTextColor={"#9b9fa3"} placeholder={"Stock code"} />
+                        </View>
+                        <View style={[MODAL.modalFooter, {flexDirection: 'row-reverse'}]}>
+                            <TouchableOpacity style={MODAL.modalPrimaryBtn} onPress={handleCreateStock}>
+                                <Text style={MODAL.modalPrimaryBtnText}>Save</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </ModalContainer>
             </AppModal>

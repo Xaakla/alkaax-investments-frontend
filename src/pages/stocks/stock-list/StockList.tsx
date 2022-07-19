@@ -15,6 +15,8 @@ const wait = (timeout) => {
 }
 
 export default function StockList({navigation}) {
+    const { stockGlobalRefreshing, setStockGlobalRefreshing } = useContext(Context);
+
     const [refreshing, setRefreshing] = useState(false);
     const refresh = React.useCallback(() => {
         setRefreshing(true);
@@ -31,31 +33,18 @@ export default function StockList({navigation}) {
     };
     const hideStockDelModal = () => setIsStockDelModalVisible(false);
 
-    const [isStockEditModalVisible, setIsStockEditModalVisible] = useState(false);
-    const showStockEditModal = (stock: any) => {
-        setStockModel(stock);
-        setIsStockEditModalVisible(true);
-    }
-    const hideStockEditModal = () => setIsStockEditModalVisible(false);
-
     useEffect(() => {
         api.get('/stocks').then(response => {
             setStocks(response?.data);
         }).catch(error => console.error('Items não armazenados no estado: ', error));
-    }, [refreshing]);
-
-    function handleEditStock() {
-        api.patch('/stocks', stockModel)
-            .then((data) => refresh())
-            .catch(err => console.error('Não foi possível salvar ação', err));
-        hideStockEditModal();
-    }
+        setStockGlobalRefreshing(false);
+    }, [refreshing, stockGlobalRefreshing]);
 
     const handleDeleteStock = () => {
         api.delete(`/stocks/${stockModel?.id}`)
             .then((response) => {
                 refresh();
-                setIsStockEditModalVisible(false);
+                hideStockDelModal();
             }).catch(error => console.error("[STOCKS] - " + error));
     }
 
@@ -84,7 +73,7 @@ export default function StockList({navigation}) {
                 <ModalContainer visible={isStockDelModalVisible} onDismiss={hideStockDelModal}>
                     <View style={MODAL.modalContainer}>
                         <View style={MODAL.modalHeader}>
-                            <Text style={MODAL.modalHeaderTitle}>Teste Titulo</Text>
+                            <Text style={MODAL.modalHeaderTitle}>Tem certeza que deseja deletar essa ação?</Text>
                         </View>
                         <View style={MODAL.modalFooter}>
                             <TouchableOpacity style={MODAL.modalSecondaryBtn} onPress={() => hideStockDelModal()}>
@@ -92,29 +81,6 @@ export default function StockList({navigation}) {
                             </TouchableOpacity>
                             <TouchableOpacity style={MODAL.modalPrimaryBtn} onPress={() => handleDeleteStock()}>
                                 <Text style={MODAL.modalPrimaryBtnText}>Confirmar</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </ModalContainer>
-            </AppModal>
-
-            <AppModal>
-                <ModalContainer visible={isStockEditModalVisible} onDismiss={hideStockEditModal}>
-                    <View style={MODAL.modalContainer}>
-                        <View style={MODAL.modalHeader}>
-                            <Text style={MODAL.modalHeaderTitle}>Edit Stock</Text>
-                            <TouchableOpacity onPress={hideStockEditModal}>
-                                <Icon name="md-close" style={[MODAL.modalHeaderIcon, MODAL.redColor]}/>
-                            </TouchableOpacity>
-                        </View>
-                        <View style={MODAL.modalContent}>
-                            <TextInput style={MODAL.modalInput} defaultValue={stockModel.code}
-                                       onChangeText={(value) => setStockModel({...stockModel, code: value})}
-                                       placeholderTextColor={"#9b9fa3"} placeholder={"Stock code"} maxLength={12}/>
-                        </View>
-                        <View style={MODAL.modalFooter}>
-                            <TouchableOpacity style={MODAL.modalPrimaryBtn} onPress={handleEditStock}>
-                                <Text style={MODAL.modalPrimaryBtnText}>Save</Text>
                             </TouchableOpacity>
                         </View>
                     </View>

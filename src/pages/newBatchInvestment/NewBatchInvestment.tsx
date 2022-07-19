@@ -9,11 +9,13 @@ import { TABLE } from "../../global-styles/table";
 import { BUTTON } from "../../global-styles/button";
 import { COLORS } from "../../global-styles/colors";
 import api from "../../services/api";
+import Icon from 'react-native-vector-icons/Feather';
 
 export default function NewBatchInvestment({ navigation, route }) {
 
     const [newBatchInvestment, setNewBatchInvestment] = useState<string>(route?.params?.batch?.name || "");
     const [investmentMoves, setInvestmentMoves] = useState([]);
+    const [investmentMovesToDelete, setInvestmentMovesToDelete] = useState<number[]>([]);
     const [stocks, setStocks] = useState([]);
     const [totalPrice, setTotalPrice] = useState(0);
     const [totalQuotas, setTotalQuotas] = useState(0);
@@ -92,9 +94,16 @@ export default function NewBatchInvestment({ navigation, route }) {
     };
 
     const deleteMove = (index: number) => {
+        setInvestmentMovesToDelete([...investmentMovesToDelete, investmentMoves[index].id]);
         const temp = investmentMoves;
         temp.splice(index, 1);
         setInvestmentMoves([...temp]);
+    };
+
+    const deleteBatch = () => {
+        api.delete(`/batch-investments/${route?.params?.batch?.id}`).then(() => {
+            navigation.goBack();
+        }).catch(err => console.error('erro ao deletar batch'));
     };
 
     const calculateTotalQuotas = (): number => {
@@ -120,6 +129,7 @@ export default function NewBatchInvestment({ navigation, route }) {
     });
 
     const createInvestmentMoves = () => new Promise((resolve, reject) => {
+        console.log('createInvestmentMoves', investmentMoves);
         api.post('/investment-move', investmentMoves)
             .then(() => resolve(true)).catch(() => reject(false));
     });
@@ -156,6 +166,15 @@ export default function NewBatchInvestment({ navigation, route }) {
         createNewBatchInvestment()
             .then((response: any) => {
                 investmentMoves.map(it => it.batchInvestmentId = response.id);
+
+                if (investmentMovesToDelete.length > 0) {
+                    console.log(`/investment-move?ids=${investmentMovesToDelete}`)
+                    api.delete(`/investment-move?ids=${investmentMovesToDelete}`)
+                        .then(() => {
+                            console.log('alo')
+                        }).catch((err) => console.error('[DELETE] - Erro ao deletar movimentos', err));
+                }
+
                 createInvestmentMoves().then(() => {
                     navigation.navigate("Investments");
                 }).catch(() => console.error('[POST] - Erro ao salvar movimentos de investimento'));
@@ -168,6 +187,15 @@ export default function NewBatchInvestment({ navigation, route }) {
                 <TextInput style={BATCH_STYLES.textInput} defaultValue={newBatchInvestment}
                    onChangeText={(value) => setNewBatchInvestment(value)}
                    placeholder={"Nome do lote de investimentos"} placeholderTextColor={COLORS.placeholderText} />
+
+                {route?.params?.batch?.id && (
+                    <Icon.Button
+                        name="trash-2"
+                        size={24}
+                        backgroundColor="transparent"
+                        onPress={() => deleteBatch()}>
+                    </Icon.Button>
+                )}
             </View>
 
             <View style={styles.tableContainer}>

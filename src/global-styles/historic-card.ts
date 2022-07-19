@@ -25,7 +25,6 @@ export const HISTORIC_CARD = StyleSheet.create({
         fontWeight: "700"
     },
     historicPriceText: {
-        color: COLORS.green,
         fontSize: 16,
         fontWeight: "600"
     },

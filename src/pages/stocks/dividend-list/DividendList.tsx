@@ -49,7 +49,7 @@ export default function DividendList({navigation}) {
                                 onPress={() => handleEditBatch(div)}>
                             </Icon.Button>
                         </View>
-                        <Text style={HISTORIC_CARD.historicPriceText}>R$ {div.total}</Text>
+                        <Text style={[HISTORIC_CARD.historicPriceText, {color: div.total > 0 ? COLORS.green : COLORS.red}]}>R$ {div.total}</Text>
                     </View>
                     <View style={HISTORIC_CARD.historicCardBody}>
                         {div.moves.map((move, index) => (
