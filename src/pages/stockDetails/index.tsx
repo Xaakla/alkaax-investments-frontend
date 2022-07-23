@@ -16,8 +16,10 @@ const Tab = createMaterialTopTabNavigator();
 
 export default function StockDetails({navigation, route}) {
 
-    const { globalRefreshing, setGlobalRefreshing } = useContext(Context);
+    const { setGlobalRefreshing } = useContext(Context);
 
+    const [incomeVariableInvestment, setIncomeVariableInvestment] = useState(0);
+    const [incomeVariableDividend, setIncomeVariableDividend] = useState(0);
     const [stock, setStock] = useState({id: null, code: '', quotas: 0});
     const [stockName, setStockName] = useState('');
 
@@ -30,6 +32,16 @@ export default function StockDetails({navigation, route}) {
             .then(({data}) => {
                 setStock(data);
                 setStockName(data.code);
+            }).catch(error => console.error('Items não armazenados no estado: ', error));
+
+        api.get(`/balance-info/variable-income-investment/${route?.params}`)
+            .then(({data}) => {
+                setIncomeVariableInvestment(data);
+            }).catch(error => console.error('Items não armazenados no estado: ', error));
+
+        api.get(`/balance-info/variable-income-dividend/${route?.params}`)
+            .then(({data}) => {
+                setIncomeVariableDividend(data);
             }).catch(error => console.error('Items não armazenados no estado: ', error));
     }, []);
 
@@ -81,11 +93,11 @@ export default function StockDetails({navigation, route}) {
                         </View>
                         <View>
                             <Text style={INFO_BOX.infoBoxLabelText}>Capital Investido:</Text>
-                            <Text style={INFO_BOX.infoBoxFooterText}>R$ 10.999,50</Text>
+                            <Text style={INFO_BOX.infoBoxFooterText}>R$ {incomeVariableInvestment.toFixed(2)}</Text>
                         </View>
                         <View>
                             <Text style={INFO_BOX.infoBoxLabelText}>Capital Ganho:</Text>
-                            <Text style={[INFO_BOX.infoBoxFooterText, {color: COLORS.green}]}>R$ 2.600,00</Text>
+                            <Text style={[INFO_BOX.infoBoxFooterText, {color: COLORS.green}]}>R$ {incomeVariableDividend.toFixed(2)}</Text>
                         </View>
                     </View>
                 </View>

@@ -34,6 +34,8 @@ export default function DividendList({navigation}) {
 
     const handleEditBatch = (batch: any) => navigation.navigate("NewBatchDividend", {batch});
 
+    const gotoStockDetails = (stockId) => navigation.navigate("StockDetails", stockId);
+
     return (
         <>
         <ScrollView style={styles.container}
@@ -60,7 +62,7 @@ export default function DividendList({navigation}) {
                     </View>
                     <View style={HISTORIC_CARD.historicCardBody}>
                         {div.moves.map((move, index) => (
-                            <TouchableOpacity style={HISTORIC_CARD.historicCardItem} key={`moveDividend-${move.id}`}>
+                            <TouchableOpacity style={HISTORIC_CARD.historicCardItem} key={`moveDividend-${move.id}`} onPress={() => gotoStockDetails(move?.stock?.id)}>
                                 <Text style={HISTORIC_CARD.historicCardItemName}>{move.quantity} - {move.stock.code}</Text>
                                 <Text style={HISTORIC_CARD.historicCardItemUntPrice}>R$ {move.price}</Text>
                                 <Text style={HISTORIC_CARD.historicCardItemTotalPrice}>R$ {(move.price * move.quantity).toFixed(2)}</Text>

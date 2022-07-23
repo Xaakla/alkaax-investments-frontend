@@ -41,6 +41,8 @@ export default function InvestmentList({navigation}) {
     
     const handleEditBatch = (batch: any) => navigation.navigate("NewBatchInvestment", {batch});
 
+    const gotoStockDetails = (stockId) => navigation.navigate("StockDetails", stockId);
+
     return (
         <>
         <ScrollView style={styles.container}
@@ -67,7 +69,8 @@ export default function InvestmentList({navigation}) {
                     </View>
                     <View style={HISTORIC_CARD.historicCardBody}>
                         {investment.moves.map((move, index) => (
-                            <TouchableOpacity style={HISTORIC_CARD.historicCardItem} key={`moveInvestment-${move.id}`} onLongPress={() => {}}>
+                            <TouchableOpacity style={HISTORIC_CARD.historicCardItem} key={`moveInvestment-${move.id}`}
+                                              onPress={() => gotoStockDetails(move?.stock?.id)} onLongPress={() => {}}>
                                 <Text style={HISTORIC_CARD.historicCardItemName}>{move.quantity} - {move.stock.code}</Text>
                                 <Text style={HISTORIC_CARD.historicCardItemUntPrice}>R$ {move.price}</Text>
                                 <Text style={{color: move.status === "BUY" ? COLORS.green : COLORS.red}}>R$ {(move.price * move.quantity).toFixed(2)}</Text>

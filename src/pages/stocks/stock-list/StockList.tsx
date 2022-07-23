@@ -52,7 +52,7 @@ export default function StockList({navigation}) {
             }).catch(error => console.error("[STOCKS] - " + error));
     }
 
-    const gotoStockDetails = (stockId) => navigation.navigate("StockDetails", stockId)
+    const gotoStockDetails = (stockId) => navigation.navigate("StockDetails", stockId);
 
     return (
         <>
