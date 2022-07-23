@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect, useState, useContext} from "react";
 import {Text, View, StyleSheet, TextInput, TouchableOpacity} from 'react-native';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import { INFO_BOX } from "../../global-styles/info-box";
@@ -8,13 +8,15 @@ import DetailInvestmentList from './detail-investment-list';
 import DetailDividendList from './detail-dividend-list';
 import api from "../../services/api";
 import Icon from 'react-native-vector-icons/Feather';
+import {Modal as ModalContainer, Portal} from 'react-native-paper';
+import AppModal from '../../components/AppModal';
+import {Context} from "../../context/context";
 
 const Tab = createMaterialTopTabNavigator();
 
-import {Modal as ModalContainer, Portal} from 'react-native-paper';
-import AppModal from '../../components/AppModal';
-
 export default function StockDetails({navigation, route}) {
+
+    const { globalRefreshing, setGlobalRefreshing } = useContext(Context);
 
     const [stock, setStock] = useState({id: null, code: '', quotas: 0});
     const [stockName, setStockName] = useState('');
@@ -34,7 +36,7 @@ export default function StockDetails({navigation, route}) {
     const editStock = () => {
         api.patch('/stocks', {...stock, code: stockName})
             .then(() => {
-                alert('Stock code updated successfully');
+                setGlobalRefreshing(true);
                 navigation.goBack();
             }).catch(error => console.error('Items não armazenados no estado: ', error));
     }
@@ -42,7 +44,7 @@ export default function StockDetails({navigation, route}) {
     const deleteStock = () => {
         api.delete(`/stocks/${stock.id}`)
             .then(() => {
-                alert('Stock code deleted successfully');
+                setGlobalRefreshing(true);
                 navigation.goBack();
             }).catch(error => console.error('Items não armazenados no estado: ', error));
     }

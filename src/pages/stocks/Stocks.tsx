@@ -2,16 +2,12 @@ import {useContext, useState, useEffect} from "react";
 import {StyleSheet, Text, View, TouchableOpacity, TextInput} from "react-native";
 import ActionButton from 'react-native-action-button';
 import Icon from 'react-native-vector-icons/Ionicons';
-
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import StockList from "./stock-list/StockList";
 import DividendList from "./dividend-list/DividendList";
 import InvestmentList from "./investment-list/InvestmentList";
-
 import api from '../../services/api';
-
 import {Context} from "../../context/context";
-
 import AppModal from "../../components/AppModal";
 import {Modal as ModalContainer} from 'react-native-paper';
 import { MODAL } from "../../global-styles/modal";
@@ -21,7 +17,7 @@ import { COLORS } from "../../global-styles/colors";
 const Tab = createMaterialTopTabNavigator();
 
 export default function Stocks({navigation}) {
-    const { stockGlobalRefreshing, setStockGlobalRefreshing } = useContext(Context);
+    const { globalRefreshing, setGlobalRefreshing } = useContext(Context);
 
     const [totalBalance, setTotalBalance] = useState(0);
     const [totalStocks, setTotalStocks] = useState(0);
@@ -35,7 +31,7 @@ export default function Stocks({navigation}) {
     const handleCreateStock = () => {
         api.post('/stocks', {code: newStockCode})
             .then((data) => {
-                setStockGlobalRefreshing(true);
+                setGlobalRefreshing(true);
                 hideStockNewModal();
             }).catch(err => console.error('Não foi possível salvar ação', err));
     }
@@ -61,8 +57,8 @@ export default function Stocks({navigation}) {
                 setTotalStocks(response.data);
             }).catch(err => console.error('Erro no request', err));
 
-        setStockGlobalRefreshing(false);
-    }, [stockGlobalRefreshing]);
+        setGlobalRefreshing(false);
+    }, [globalRefreshing]);
 
 
     return (
@@ -123,7 +119,7 @@ export default function Stocks({navigation}) {
                 <ModalContainer visible={isStockNewModalVisible} onDismiss={hideStockNewModal}>
                     <View style={MODAL.modalContainer}>
                         <View style={MODAL.modalHeader}>
-                            <Text style={MODAL.modalHeaderTitle}>Edit Stock</Text>
+                            <Text style={MODAL.modalHeaderTitle}>New Stock</Text>
                             <TouchableOpacity onPress={hideStockNewModal}>
                                 <Icon name="md-close" style={[MODAL.modalHeaderIcon, MODAL.redColor]} />
                             </TouchableOpacity>

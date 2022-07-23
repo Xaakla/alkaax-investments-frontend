@@ -5,6 +5,7 @@ import { HISTORIC_CARD } from "../../../global-styles/historic-card";
 import api from "../../../services/api";
 import Icon from 'react-native-vector-icons/Feather';
 import { maskCurrency } from '../../../services/helpers';
+import {Context} from "../../../context/context";
 
 const wait = (timeout) => {
     return new Promise(resolve => setTimeout(resolve, timeout));
@@ -12,19 +13,25 @@ const wait = (timeout) => {
 
 export default function InvestmentList({navigation}) {
 
-    const [investments, setInvestments] = useState([]);
-    const [investmentsRefreshing, setInvestmentsRefreshing] = useState(false);
+    const { globalRefreshing, setGlobalRefreshing } = useContext(Context);
 
-    const refreshInvestmentList = useCallback(() => {
-        setInvestmentsRefreshing(true);
-        wait(2000).then(() => setInvestmentsRefreshing(false));
+    const [investments, setInvestments] = useState([]);
+    const [refreshing, setRefreshing] = useState(false);
+
+    const refresh = useCallback(() => {
+        setRefreshing(true);
+        setGlobalRefreshing(true);
+        wait(2000).then(() => {
+            setRefreshing(false);
+            setGlobalRefreshing(false);
+        });
     }, []);
 
     useEffect(() => {
         api.get('/batch-investments/groups').then(response => {
             setInvestments(response?.data);
         }).catch(error => console.error('Items não armazenados no estado: ', error));
-    }, [investmentsRefreshing]);
+    }, [refreshing, globalRefreshing]);
 
     const calculateQtdMoves = (moves: any[], status: string) => {
         let qtd = 0;
@@ -39,8 +46,8 @@ export default function InvestmentList({navigation}) {
         <ScrollView style={styles.container}
             refreshControl={
                 <RefreshControl
-                    refreshing={investmentsRefreshing}
-                    onRefresh={refreshInvestmentList}
+                    refreshing={refreshing}
+                    onRefresh={refresh}
                 />
             }
         >
@@ -63,7 +70,7 @@ export default function InvestmentList({navigation}) {
                             <TouchableOpacity style={HISTORIC_CARD.historicCardItem} key={`moveInvestment-${move.id}`} onLongPress={() => {}}>
                                 <Text style={HISTORIC_CARD.historicCardItemName}>{move.quantity} - {move.stock.code}</Text>
                                 <Text style={HISTORIC_CARD.historicCardItemUntPrice}>R$ {move.price}</Text>
-                                <Text style={{color: move.status === "BUY" ? COLORS.green : COLORS.red}}>R$ {move.price * move.quantity}</Text>
+                                <Text style={{color: move.status === "BUY" ? COLORS.green : COLORS.red}}>R$ {(move.price * move.quantity).toFixed(2)}</Text>
                             </TouchableOpacity>
                         ))}
                         <View style={HISTORIC_CARD.historicCardFooter}>

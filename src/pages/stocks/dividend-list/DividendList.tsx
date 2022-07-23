@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useContext } from 'react';
 import {Text, View, ScrollView, StyleSheet, TouchableOpacity, RefreshControl} from "react-native";
 import { COLORS } from "../../../global-styles/colors";
 import { HISTORIC_CARD } from "../../../global-styles/historic-card";
 import api from "../../../services/api";
 import Icon from 'react-native-vector-icons/Feather';
+import {Context} from "../../../context/context";
 
 const wait = (timeout) => {
     return new Promise(resolve => setTimeout(resolve, timeout));
@@ -11,19 +12,25 @@ const wait = (timeout) => {
 
 export default function DividendList({navigation}) {
 
-    const [dividends, setDividends] = useState([]);
-    const [dividendsRefreshing, setDividendsRefreshing] = useState(false);
+    const { globalRefreshing, setGlobalRefreshing } = useContext(Context);
 
-    const refreshDividendList = useCallback(() => {
-        setDividendsRefreshing(true);
-        wait(2000).then(() => setDividendsRefreshing(false));
+    const [dividends, setDividends] = useState([]);
+    const [refreshing, setRefreshing] = useState(false);
+
+    const refresh = useCallback(() => {
+        setRefreshing(true);
+        setGlobalRefreshing(true);
+        wait(2000).then(() => {
+            setRefreshing(false);
+            setGlobalRefreshing(false);
+        });
     }, []);
 
     useEffect(() => {
         api.get('/batch-dividends/groups').then(response => {
             setDividends(response?.data);
         }).catch(error => console.error('Items não armazenados no estado: ', error));
-    }, [dividendsRefreshing]);
+    }, [refreshing, globalRefreshing]);
 
     const handleEditBatch = (batch: any) => navigation.navigate("NewBatchDividend", {batch});
 
@@ -32,8 +39,8 @@ export default function DividendList({navigation}) {
         <ScrollView style={styles.container}
             refreshControl={
                 <RefreshControl
-                    refreshing={dividendsRefreshing}
-                    onRefresh={refreshDividendList}
+                    refreshing={refreshing}
+                    onRefresh={refresh}
                 />
             }
         >
@@ -56,7 +63,7 @@ export default function DividendList({navigation}) {
                             <TouchableOpacity style={HISTORIC_CARD.historicCardItem} key={`moveDividend-${move.id}`}>
                                 <Text style={HISTORIC_CARD.historicCardItemName}>{move.quantity} - {move.stock.code}</Text>
                                 <Text style={HISTORIC_CARD.historicCardItemUntPrice}>R$ {move.price}</Text>
-                                <Text style={HISTORIC_CARD.historicCardItemTotalPrice}>R$ {move.price * move.quantity}</Text>
+                                <Text style={HISTORIC_CARD.historicCardItemTotalPrice}>R$ {(move.price * move.quantity).toFixed(2)}</Text>
                             </TouchableOpacity>
                         ))}
                     </View>

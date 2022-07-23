@@ -4,11 +4,11 @@ export const Context = createContext(null);
 
 function ContextProvider({ children }) {
 
-    const [stockGlobalRefreshing, setStockGlobalRefreshing] = useState(false);
+    const [globalRefreshing, setGlobalRefreshing] = useState(false);
 
     return (
         <Context.Provider value={{
-            stockGlobalRefreshing, setStockGlobalRefreshing
+            globalRefreshing, setGlobalRefreshing
         }}>
             { children }
         </Context.Provider>

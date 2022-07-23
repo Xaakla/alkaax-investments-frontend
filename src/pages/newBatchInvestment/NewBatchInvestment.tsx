@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import {View, Text, StyleSheet, TouchableOpacity, Button, ScrollView, TextInput} from 'react-native';
 import Checkbox from 'expo-checkbox';
 import SelectDropdown from 'react-native-select-dropdown';
@@ -10,8 +10,14 @@ import { BUTTON } from "../../global-styles/button";
 import { COLORS } from "../../global-styles/colors";
 import api from "../../services/api";
 import Icon from 'react-native-vector-icons/Feather';
+import {Context} from "../../context/context";
+import {Modal as ModalContainer, Portal} from 'react-native-paper';
+import AppModal from '../../components/AppModal';
+import {MODAL} from "../../global-styles/modal";
 
 export default function NewBatchInvestment({ navigation, route }) {
+
+    const { setGlobalRefreshing } = useContext(Context);
 
     const [newBatchInvestment, setNewBatchInvestment] = useState<string>(route?.params?.batch?.name || "");
     const [investmentMoves, setInvestmentMoves] = useState([]);
@@ -19,6 +25,10 @@ export default function NewBatchInvestment({ navigation, route }) {
     const [stocks, setStocks] = useState([]);
     const [totalPrice, setTotalPrice] = useState(0);
     const [totalQuotas, setTotalQuotas] = useState(0);
+
+    const [isBatchDelModalVisible, setIsBatchDelModalVisible] = useState(false);
+    const showBatchDelModal = () => setIsBatchDelModalVisible(true);
+    const hideBatchDelModal = () => setIsBatchDelModalVisible(false);
 
     useEffect(() => {
         api.get("/stocks")
@@ -102,6 +112,7 @@ export default function NewBatchInvestment({ navigation, route }) {
 
     const deleteBatch = () => {
         api.delete(`/batch-investments/${route?.params?.batch?.id}`).then(() => {
+            setGlobalRefreshing(true);
             navigation.goBack();
         }).catch(err => console.error('erro ao deletar batch'));
     };
@@ -176,12 +187,14 @@ export default function NewBatchInvestment({ navigation, route }) {
                 }
 
                 createInvestmentMoves().then(() => {
+                    setGlobalRefreshing(true);
                     navigation.navigate("Investments");
                 }).catch(() => console.error('[POST] - Erro ao salvar movimentos de investimento'));
             }).catch(() => console.error('[POST] - Não foi possível criar o lote.'));
     };
 
     return (
+        <>
         <View style={styles.container}>
             <View style={[styles.row]}>
                 <TextInput style={BATCH_STYLES.textInput} defaultValue={newBatchInvestment}
@@ -193,7 +206,7 @@ export default function NewBatchInvestment({ navigation, route }) {
                         name="trash-2"
                         size={24}
                         backgroundColor="transparent"
-                        onPress={() => deleteBatch()}>
+                        onPress={() => showBatchDelModal()}>
                     </Icon.Button>
                 )}
             </View>
@@ -281,7 +294,7 @@ export default function NewBatchInvestment({ navigation, route }) {
 
                     <View style={[styles.row, TABLE.tableFooter]}>
                         <Text style={[TABLE.tableFooterInfoText]}>Total Quotas: {totalQuotas}</Text>
-                        <Text style={[TABLE.tableFooterInfoText, {color: COLORS.green}]}>Total Price: R$ {totalPrice}</Text>
+                        <Text style={[TABLE.tableFooterInfoText, {color: COLORS.green}]}>Total Price: R$ {totalPrice.toFixed(2)}</Text>
                     </View>
                 </DataTable>
 
@@ -292,6 +305,25 @@ export default function NewBatchInvestment({ navigation, route }) {
                 </View>
             </View>
         </View>
+
+        <AppModal>
+            <ModalContainer visible={isBatchDelModalVisible} onDismiss={hideBatchDelModal}>
+                <View style={MODAL.modalContainer}>
+                    <View style={MODAL.modalHeader}>
+                        <Text style={MODAL.modalHeaderTitle}>Tem certeza que deseja deletar esse lote?</Text>
+                    </View>
+                    <View style={MODAL.modalFooter}>
+                        <TouchableOpacity style={MODAL.modalSecondaryBtn} onPress={() => hideBatchDelModal()}>
+                            <Text style={MODAL.modalSecondaryBtnText}>Cancelar</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={MODAL.modalPrimaryBtn} onPress={() => deleteBatch()}>
+                            <Text style={MODAL.modalPrimaryBtnText}>Confirmar</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </ModalContainer>
+        </AppModal>
+        </>
     );
 }
 

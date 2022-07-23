@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useContext} from 'react';
 import React, {View, Text, StyleSheet, TouchableOpacity, Button, ScrollView, TextInput} from 'react-native';
 import SelectDropdown from 'react-native-select-dropdown';
 import CurrencyInput from 'react-native-currency-input';
@@ -8,14 +8,25 @@ import { TABLE } from "../../global-styles/table";
 import { BUTTON } from "../../global-styles/button";
 import { COLORS } from "../../global-styles/colors";
 import api from "../../services/api";
+import {Context} from "../../context/context";
+import Icon from 'react-native-vector-icons/Feather';
+import {Modal as ModalContainer, Portal} from 'react-native-paper';
+import AppModal from '../../components/AppModal';
+import {MODAL} from "../../global-styles/modal";
 
 export default function NewBatchDividend({ navigation, route }) {
+
+    const { setGlobalRefreshing } = useContext(Context);
 
     const [newBatchDividend, setNewBatchDividend] = useState<string>(route?.params?.batch?.name || "");
     const [divMoves, setDivMoves] = useState([]);
     const [stocks, setStocks] = useState([]);
     const [totalPrice, setTotalPrice] = useState(0);
     const [totalQuotas, setTotalQuotas] = useState(0);
+
+    const [isBatchDelModalVisible, setIsBatchDelModalVisible] = useState(false);
+    const showBatchDelModal = () => setIsBatchDelModalVisible(true);
+    const hideBatchDelModal = () => setIsBatchDelModalVisible(false);
 
     useEffect(() => {
         api.get("/stocks")
@@ -98,6 +109,14 @@ export default function NewBatchDividend({ navigation, route }) {
         setDivMoves([...temp]);
     };
 
+    const deleteBatch = () => {
+        console.log(route?.params?.batch?.id)
+        api.delete(`/batch-dividends/${route?.params?.batch?.id}`).then(() => {
+            setGlobalRefreshing(true);
+            navigation.goBack();
+        }).catch(err => console.error('erro ao deletar batch'));
+    };
+
     const createDividendMoves = () => new Promise((resolve, reject) => {
         console.log('divMoves', divMoves)
         api.post('/dividend-move', divMoves)
@@ -138,17 +157,28 @@ export default function NewBatchDividend({ navigation, route }) {
             .then((response: any) => {
                 divMoves.map(it => it.batchDividendId = response.id);
                 createDividendMoves().then(() => {
+                    setGlobalRefreshing(true);
                     navigation.navigate("Dividends");
                 }).catch(() => console.error('[POST] - Erro ao salvar movimentos de dividendo'));
             }).catch(() => console.error('[POST] - Não foi possível criar o lote.'));
     };
 
     return (
+        <>
         <View style={styles.container}>
             <View style={[styles.row]}>
                 <TextInput style={BATCH_STYLES.textInput} defaultValue={newBatchDividend}
                    onChangeText={(value) => setNewBatchDividend(value)}
                    placeholder={"Nome do lote de dividendos"} placeholderTextColor={COLORS.placeholderText} />
+
+                {route?.params?.batch?.id && (
+                    <Icon.Button
+                        name="trash-2"
+                        size={24}
+                        backgroundColor="transparent"
+                        onPress={() => showBatchDelModal()}>
+                    </Icon.Button>
+                )}
             </View>
 
             <View style={styles.tableContainer}>
@@ -223,7 +253,7 @@ export default function NewBatchDividend({ navigation, route }) {
 
                     <View style={[styles.row, TABLE.tableFooter]}>
                         <Text style={[TABLE.tableFooterInfoText]}>Total Quotas: {totalQuotas}</Text>
-                        <Text style={[TABLE.tableFooterInfoText, {color: COLORS.green}]}>Total Price: R$ {totalPrice}</Text>
+                        <Text style={[TABLE.tableFooterInfoText, {color: COLORS.green}]}>Total Price: R$ {totalPrice.toFixed(2)}</Text>
                     </View>
                 </DataTable>
 
@@ -234,6 +264,25 @@ export default function NewBatchDividend({ navigation, route }) {
                 </View>
             </View>
         </View>
+
+        <AppModal>
+            <ModalContainer visible={isBatchDelModalVisible} onDismiss={hideBatchDelModal}>
+                <View style={MODAL.modalContainer}>
+                    <View style={MODAL.modalHeader}>
+                        <Text style={MODAL.modalHeaderTitle}>Tem certeza que deseja deletar esse lote?</Text>
+                    </View>
+                    <View style={MODAL.modalFooter}>
+                        <TouchableOpacity style={MODAL.modalSecondaryBtn} onPress={() => hideBatchDelModal()}>
+                            <Text style={MODAL.modalSecondaryBtnText}>Cancelar</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={MODAL.modalPrimaryBtn} onPress={() => deleteBatch()}>
+                            <Text style={MODAL.modalPrimaryBtnText}>Confirmar</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </ModalContainer>
+        </AppModal>
+        </>
     );
 }
 

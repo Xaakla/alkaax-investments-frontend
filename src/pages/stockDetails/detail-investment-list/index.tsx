@@ -3,6 +3,7 @@ import {Text, View, ScrollView, StyleSheet, TouchableOpacity, RefreshControl} fr
 import { HISTORIC_CARD } from "../../../global-styles/historic-card";
 import { COLORS } from "../../../global-styles/colors";
 import api from "../../../services/api";
+import Icon from 'react-native-vector-icons/Feather';
 
 const wait = (timeout) => {
     return new Promise(resolve => setTimeout(resolve, timeout));
@@ -30,6 +31,8 @@ export default function DetailInvestmentList({navigation, route}) {
         return qtd;
     };
 
+    const handleEditBatch = (batch: any) => navigation.navigate("NewBatchInvestment", {batch});
+
     return (
         <ScrollView style={styles.container}
             refreshControl={
@@ -42,15 +45,23 @@ export default function DetailInvestmentList({navigation, route}) {
             {investments.map((investment, index) => (
                 <View style={HISTORIC_CARD.historicCard} key={`batchInvestment-${investment.name}-${index}-${investment.id}`}>
                     <View style={HISTORIC_CARD.historicCardHeader}>
-                        <Text style={HISTORIC_CARD.historicTitleText}>{investment.name}</Text>
-                        <Text style={HISTORIC_CARD.historicPriceText}>R$ {investment.total}</Text>
+                        <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+                            <Text style={HISTORIC_CARD.historicTitleText}>{investment.name}</Text>
+                            <Icon.Button
+                                name="edit"
+                                size={16}
+                                backgroundColor="transparent"
+                                onPress={() => handleEditBatch(investment)}>
+                            </Icon.Button>
+                        </View>
+                        <Text style={[HISTORIC_CARD.historicPriceText, {color: investment.total > 0 ? COLORS.green : COLORS.red}]}>R$ {investment.total}</Text>
                     </View>
                     <View style={HISTORIC_CARD.historicCardBody}>
                         {investment.moves.map((move, index) => (
                             <TouchableOpacity style={HISTORIC_CARD.historicCardItem} key={`moveInvestment-${move.id}`} onLongPress={() => {}}>
                                 <Text style={HISTORIC_CARD.historicCardItemName}>{move.quantity} - {move.stock.code}</Text>
                                 <Text style={HISTORIC_CARD.historicCardItemUntPrice}>R$ {move.price}</Text>
-                                <Text style={HISTORIC_CARD.historicCardItemTotalPrice}>R$ {move.price * move.quantity}</Text>
+                                <Text style={{color: move.status === "BUY" ? COLORS.green : COLORS.red}}>R$ {(move.price * move.quantity).toFixed(2)}</Text>
                             </TouchableOpacity>
                         ))}
                         <View style={HISTORIC_CARD.historicCardFooter}>

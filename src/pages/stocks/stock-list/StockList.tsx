@@ -15,12 +15,16 @@ const wait = (timeout) => {
 }
 
 export default function StockList({navigation}) {
-    const { stockGlobalRefreshing, setStockGlobalRefreshing } = useContext(Context);
+    const { globalRefreshing, setGlobalRefreshing } = useContext(Context);
 
     const [refreshing, setRefreshing] = useState(false);
     const refresh = React.useCallback(() => {
         setRefreshing(true);
-        wait(2000).then(() => setRefreshing(false));
+        setGlobalRefreshing(true);
+        wait(2000).then(() => {
+            setRefreshing(false);
+            setGlobalRefreshing(false);
+        });
     }, []);
 
     const [stocks, setStocks] = useState([]);
@@ -37,8 +41,8 @@ export default function StockList({navigation}) {
         api.get('/stocks').then(response => {
             setStocks(response?.data);
         }).catch(error => console.error('Items não armazenados no estado: ', error));
-        setStockGlobalRefreshing(false);
-    }, [refreshing, stockGlobalRefreshing]);
+        setGlobalRefreshing(false);
+    }, [refreshing, globalRefreshing]);
 
     const handleDeleteStock = () => {
         api.delete(`/stocks/${stockModel?.id}`)
