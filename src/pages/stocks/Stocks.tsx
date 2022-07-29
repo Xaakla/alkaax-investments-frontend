@@ -2,6 +2,7 @@ import {useContext, useState, useEffect} from "react";
 import {StyleSheet, Text, View, TouchableOpacity, TextInput} from "react-native";
 import ActionButton from 'react-native-action-button';
 import Icon from 'react-native-vector-icons/Ionicons';
+import Icon2 from 'react-native-vector-icons/FontAwesome5';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import StockList from "./stock-list/StockList";
 import DividendList from "./dividend-list/DividendList";
@@ -100,17 +101,17 @@ export default function Stocks({navigation}) {
                     <Tab.Screen name="Dividends" component={DividendList}/>
                 </Tab.Navigator>
 
-                <ActionButton buttonColor="rgba(231,76,60,.7)">
-                    <ActionButton.Item buttonColor='#9b59b6' title="New Batch Dividend"
+                <ActionButton buttonColor={COLORS.blueText}>
+                    <ActionButton.Item buttonColor={COLORS.blue} title="New Batch Dividend"
                                        onPress={() => navigation.navigate("NewBatchDividend")}>
-                        <Icon name="md-create" style={styles.actionButtonIcon}/>
+                        <Icon2 name="coins" style={styles.actionButtonIcon}/>
                     </ActionButton.Item>
-                    <ActionButton.Item buttonColor='#3498db' title="New Batch Investment"
+                    <ActionButton.Item buttonColor={COLORS.blue} title="New Batch Investment"
                                        onPress={() => navigation.navigate("NewBatchInvestment")}>
-                        <Icon name="md-notifications-off" style={styles.actionButtonIcon}/>
+                        <Icon name="trending-up-outline" style={styles.actionButtonIcon}/>
                     </ActionButton.Item>
-                    <ActionButton.Item buttonColor='#1abc9c' title="New Stock" onPress={showStockNewModel}>
-                        <Icon name="md-create" style={styles.actionButtonIcon}/>
+                    <ActionButton.Item buttonColor={COLORS.blue} title="New Stock" onPress={showStockNewModel}>
+                        <Icon name="md-create-outline" style={styles.actionButtonIcon}/>
                     </ActionButton.Item>
                 </ActionButton>
             </View>

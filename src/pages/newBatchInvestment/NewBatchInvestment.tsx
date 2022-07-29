@@ -163,7 +163,7 @@ export default function NewBatchInvestment({ navigation, route }) {
             }
             if (it.price < 0) {
                 hasErrors = true;
-                return console.error('[ERROR] - Preço inválido')
+                return console.error('[ERROR] - Preço inválido');
             }
             if (it.quantity <= 0) {
                 hasErrors = true;
