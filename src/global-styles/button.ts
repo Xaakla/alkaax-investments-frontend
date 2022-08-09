@@ -10,6 +10,7 @@ export const BUTTON = StyleSheet.create({
     },
     whiteButtonText: {
         color: COLORS.whiteText,
-        fontWeight: "600"
+        fontWeight: "600",
+        textAlign: "center",
     },
 });

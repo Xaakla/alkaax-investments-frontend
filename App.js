@@ -1,7 +1,6 @@
 import React from "react";
 import {StatusBar} from 'react-native';
 import 'react-native-gesture-handler';
-import COLORS from './src/global-styles/colors';
 
 import {NavigationContainer} from "@react-navigation/native";
 import {createStackNavigator} from "@react-navigation/stack";
@@ -15,6 +14,8 @@ import NewBatchDividend from "./src/pages/newBatchDividend/NewBatchDividend";
 import StockDetails from './src/pages/stockDetails';
 
 import ContextProvider from './src/context/context';
+import Signin from "./src/pages/signin";
+import Signup from "./src/pages/signup";
 
 const Stack = createStackNavigator();
 
@@ -38,9 +39,19 @@ export default function App() {
         <Provider>
           <Stack.Navigator>
             <Stack.Screen
+              name="Signin"
+              component={Signin}
+              options={{ title: 'Entrar', headerShown: false }}
+            />
+            <Stack.Screen
+              name="Signup"
+              component={Signup}
+              options={{ title: 'Cadastro', headerShown: false }}
+            />
+            <Stack.Screen
               name="Home"
               component={Home}
-              options={{ title: 'Alkaax Investments', ...headerOptions }}
+              options={{ title: 'Alkaax Investments', headerLeft: () => (<></>), ...headerOptions }}
             />
             <Stack.Screen
               name="Stocks"

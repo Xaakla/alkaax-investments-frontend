@@ -5,3 +5,4 @@ const api = axios.create({
 });
 
 export default api;
+// "permissions": ["READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE", "CAMERA", "ACCESS_FINE_LOCATION"]
